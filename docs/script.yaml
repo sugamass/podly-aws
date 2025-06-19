@@ -82,18 +82,19 @@ components:
           type: boolean
           x-stoplight:
             id: n6s9tpmmbvays
-        speakers:
-          type: array
-          x-stoplight:
-            id: wojugtydsmht9
-          items:
-            x-stoplight:
-              id: 9ad90l9mwxm5h
-            type: string
         wordCount:
           type: number
           x-stoplight:
             id: f4k9ec8i5kz4c
+        situation:
+          x-stoplight:
+            id: tzb3vwoa10x90
+          enum:
+            - school
+            - expert
+            - interview
+            - friends
+            - radio_personality
     PromptScriptData:
       title: PromptScriptData
       x-stoplight:
@@ -120,6 +121,10 @@ components:
             x-stoplight:
               id: qesuk2rjlquwk
             type: string
+        situation:
+          type: string
+          x-stoplight:
+            id: vo2x9lnp0h24q
     PostCreateScriptResponse:
       title: PostCreateScriptResponse
       x-stoplight:
