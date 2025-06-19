@@ -65,7 +65,7 @@ paths:
         - schema:
             type: string
           in: query
-          name: user_id
+          name: userId
   /audio/test:
     post:
       summary: Your POST endpoint
@@ -137,7 +137,7 @@ paths:
         - schema:
             type: string
           in: query
-          name: script_id
+          name: scriptId
 components:
   schemas:
     PostAudioForRequest:
@@ -149,7 +149,7 @@ components:
         - title
         - script
         - description
-        - user_id
+        - userId
         - reference
         - tts
         - voices
@@ -169,7 +169,7 @@ components:
           type: string
           x-stoplight:
             id: 5rpgugdk8ni5k
-        user_id:
+        userId:
           type: string
           x-stoplight:
             id: ehao79slqdo9k
@@ -237,8 +237,8 @@ components:
         - voices
         - speakers
         - script
-        - created_by
-        - created_at
+        - createdBy
+        - createdAt
       properties:
         id:
           type: string
@@ -290,11 +290,11 @@ components:
             id: xlnm786dhqr7k
           items:
             $ref: '#/components/schemas/ScriptData'
-        created_by:
+        createdBy:
           type: string
           x-stoplight:
             id: amcvy5rd36x2z
-        created_at:
+        createdAt:
           type: string
           x-stoplight:
             id: j8kx8ddywdxi8
@@ -330,7 +330,7 @@ components:
             x-stoplight:
               id: 0l8sacju92r1z
             type: string
-        script_id:
+        scriptId:
           type: string
           x-stoplight:
             id: sd1tr0mm5ft2d
@@ -340,11 +340,11 @@ components:
         id: b92y9uylt1nmu
       type: object
       properties:
-        m3u8_url:
+        m3u8Url:
           type: string
           x-stoplight:
             id: 6271qkeulhowr
-        mp3_urls:
+        mp3Urls:
           type: array
           x-stoplight:
             id: etlbdxfdarkdp
@@ -352,7 +352,7 @@ components:
             x-stoplight:
               id: z9y63cy1o1zdn
             type: string
-        script_id:
+        scriptId:
           type: string
           x-stoplight:
             id: t00yeucyi0p7q
@@ -364,11 +364,11 @@ components:
       required:
         - title
         - script
-        - user_id
+        - userId
         - tts
         - voices
         - speakers
-        - script_id
+        - scriptId
       properties:
         title:
           type: string
@@ -384,7 +384,7 @@ components:
             id: 894q3z5u6gr02
           items:
             $ref: '#/components/schemas/ScriptData'
-        user_id:
+        userId:
           type: string
           x-stoplight:
             id: xyqqvcd3k2v6i
@@ -416,7 +416,7 @@ components:
             x-stoplight:
               id: ffr07q5gyy2tb
             type: string
-        script_id:
+        scriptId:
           type: string
           x-stoplight:
             id: ugmecqn2g91ht

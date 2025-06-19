@@ -64,7 +64,7 @@ components:
           type: string
           x-stoplight:
             id: nce3f80elonde
-        previous_script:
+        previousScript:
           type: array
           x-stoplight:
             id: 5ulr0bv6bp5f2
@@ -78,7 +78,7 @@ components:
             x-stoplight:
               id: b3bk5pflqznqy
             type: string
-        is_search:
+        isSearch:
           type: boolean
           x-stoplight:
             id: n6s9tpmmbvays
@@ -90,7 +90,7 @@ components:
             x-stoplight:
               id: 9ad90l9mwxm5h
             type: string
-        word_count:
+        wordCount:
           type: number
           x-stoplight:
             id: f4k9ec8i5kz4c
@@ -126,11 +126,11 @@ components:
         id: 6e8ptfsrebjbt
       type: object
       required:
-        - new_script
+        - newScript
       properties:
-        new_script:
+        newScript:
           $ref: '#/components/schemas/PromptScriptData'
-        previous_script:
+        previousScript:
           type: array
           x-stoplight:
             id: zdg920wbudhh0
