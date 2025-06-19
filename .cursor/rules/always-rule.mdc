@@ -1,0 +1,42 @@
+---
+description: 
+globs: 
+alwaysApply: false
+---
+# Cursor Rules
+
+## 型の使用について
+
+### 自動生成された型の使用を必須とする
+
+APIハンドラの実装では、以下の自動生成された型を必ず使用してください：
+
+#### インポート先
+- **Audio API型**: `src/types/generated/audio.ts`から型をインポート
+- **Script API型**: `src/types/generated/script.ts`から型をインポート
+
+#### 使用例
+```typescript
+// Audio APIハンドラの場合
+import { components } from '../types/generated/audio';
+
+type AudioResponse = components['schemas']['AudioResponse'];
+type AudioRequest = components['schemas']['AudioRequest'];
+
+// Script APIハンドラの場合
+import { components } from '../types/generated/script';
+
+type ScriptResponse = components['schemas']['ScriptResponse'];
+type ScriptRequest = components['schemas']['ScriptRequest'];
+```
+
+#### 適用すべき箇所
+1. **リクエストボディの型定義**
+2. **レスポンスボディの型定義** 
+3. **パスパラメータの型定義**
+4. **クエリパラメータの型定義**
+
+#### 重要なポイント
+- 手動で型を定義せず、必ず自動生成された型を使用する
+- OpenAPIスキーマと完全に一致した型安全性を保つ
+- ビルド前に `npm run generate-types` で型を最新化する

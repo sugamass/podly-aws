@@ -6,6 +6,10 @@
   "scripts": {
     "dev": "serverless offline",
     "build": "tsc",
+    "generate-types": "npm run generate-types:audio && npm run generate-types:script",
+    "generate-types:audio": "openapi-typescript docs/audio.yaml -o src/types/generated/audio.ts",
+    "generate-types:script": "openapi-typescript docs/script.yaml -o src/types/generated/script.ts",
+    "prebuild": "npm run generate-types",
     "deploy": "serverless deploy",
     "deploy:dev": "serverless deploy --stage dev",
     "deploy:prod": "serverless deploy --stage prod",
@@ -27,6 +31,7 @@
   "devDependencies": {
     "@types/aws-lambda": "^8.10.134",
     "@types/node": "^20.10.8",
+    "openapi-typescript": "^6.7.3",
     "serverless": "^3.40.0",
     "serverless-offline": "^13.3.2",
     "serverless-webpack": "^5.13.0",
