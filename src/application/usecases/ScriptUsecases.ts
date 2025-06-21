@@ -8,8 +8,8 @@ export class CreateScriptUseCase {
   async execute(
     request: PostCreateScriptRequest
   ): Promise<PostCreateScriptResponse> {
-    // 1. リクエストの検証
-    this.validateCreateScriptRequest(request);
+    // 1. ドメイン固有のバリデーション
+    this.validateDomainRules(request);
 
     // 2. 新しいスクリプトを生成
     const newScript = await this.generateScript(request);
@@ -24,20 +24,16 @@ export class CreateScriptUseCase {
   }
 
   /**
-   * スクリプト作成の入力を検証する
+   * ドメイン固有のルール（ビジネスルール）を検証する
    */
-  private validateCreateScriptRequest(request: PostCreateScriptRequest): void {
-    if (!request.prompt || request.prompt.trim() === "") {
-      throw new Error("Prompt is required");
-    }
-
-    if (request.wordCount && request.wordCount <= 0) {
-      throw new Error("Word count must be positive");
-    }
-
+  private validateDomainRules(request: PostCreateScriptRequest): void {
+    // situationの有効値チェック（ビジネスルール）
     if (request.situation && !this.isValidSituation(request.situation)) {
       throw new Error("Invalid situation");
     }
+
+    // その他のドメイン固有のルールがあればここに追加
+    // 例：特定のキーワードの組み合わせが禁止されている、など
   }
 
   /**
