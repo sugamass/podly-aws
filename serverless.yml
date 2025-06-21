@@ -56,4 +56,11 @@ functions:
     events:
       - httpApi:
           path: /podcasts
-          method: get 
+          method: get
+          
+  createScript:
+    handler: src/handlers/script.createScript
+    events:
+      - httpApi:
+          path: /script/create
+          method: post 
