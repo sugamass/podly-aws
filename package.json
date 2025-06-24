@@ -5,7 +5,7 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "serverless offline",
-    "build": "tsc",
+    "build": "serverless webpack",
     "generate-types": "npm run generate-types:audio && npm run generate-types:script",
     "generate-types:audio": "openapi-typescript docs/audio.yaml -o src/types/generated/audio.ts",
     "generate-types:script": "openapi-typescript docs/script.yaml -o src/types/generated/script.ts",
@@ -33,6 +33,7 @@
     "@types/node": "^20.10.8",
     "openapi-typescript": "^6.7.3",
     "serverless": "^3.40.0",
+    "serverless-dotenv-plugin": "^6.0.0",
     "serverless-offline": "^13.3.2",
     "serverless-webpack": "^5.13.0",
     "ts-loader": "^9.5.1",
@@ -40,5 +41,10 @@
     "typescript": "^5.3.3",
     "webpack": "^5.89.0",
     "webpack-cli": "^5.1.4"
+  },
+  "dependencies": {
+    "@graphai/agent_filters": "^2.0.0",
+    "@graphai/agents": "^2.0.5",
+    "graphai": "^2.0.8"
   }
 }

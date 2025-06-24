@@ -12,11 +12,14 @@ provider:
   environment:
     NODE_ENV: ${self:provider.stage}
     STAGE: ${self:provider.stage}
+    OPENAI_API_KEY: ${env:OPENAI_API_KEY}
+    TAVILY_API_KEY: ${env:TAVILY_API_KEY}
   
   httpApi:
     cors: true
 
 plugins:
+  - serverless-dotenv-plugin
   - serverless-webpack
   - serverless-offline
 
@@ -29,35 +32,7 @@ custom:
     httpPort: 3000
     reloadHandler: true
 
-functions:
-  hello:
-    handler: src/handlers/hello.handler
-    events:
-      - httpApi:
-          path: /hello
-          method: get
-  
-  createPodcast:
-    handler: src/handlers/podcast.createPodcast
-    events:
-      - httpApi:
-          path: /podcasts
-          method: post
-          
-  getPodcast:
-    handler: src/handlers/podcast.getPodcast
-    events:
-      - httpApi:
-          path: /podcasts/{id}
-          method: get
-          
-  listPodcasts:
-    handler: src/handlers/podcast.listPodcasts
-    events:
-      - httpApi:
-          path: /podcasts
-          method: get
-          
+functions:          
   createScript:
     handler: src/handlers/script.createScript
     events:
