@@ -40,3 +40,180 @@ type ScriptRequest = components['schemas']['ScriptRequest'];
 - 手動で型を定義せず、必ず自動生成された型を使用する
 - OpenAPIスキーマと完全に一致した型安全性を保つ
 - ビルド前に `npm run generate-types` で型を最新化する
+
+## フォルダ構成について
+
+### ドメイン駆動設計に基づくフォルダ構成を必須とする
+
+#### 基本構成
+```
+src/
+├── handlers/           # APIエンドポイントハンドラ
+│   ├── converter/     # API型とドメイン型の変換
+│   ├── audio.ts       # Audio APIハンドラ
+│   └── script.ts      # Script APIハンドラ
+├── application/        # アプリケーション層
+│   └── usecases/      # ユースケース（ビジネスロジック）
+├── domain/            # ドメイン層
+│   ├── audio/         # Audio関連のドメイン
+│   │   └── entities/  # エンティティ
+│   └── script/        # Script関連のドメイン
+│       └── entities/  # エンティティ
+├── infrastructure/    # インフラストラクチャ層
+│   ├── repositories/ # データ永続化
+│   └── services/     # 外部サービス連携
+└── types/             # 型定義
+    └── generated/     # 自動生成された型
+```
+
+#### フォルダ作成ルール
+1. **新しいAPIの追加時**：
+   - `src/handlers/{api_name}.ts` - APIハンドラ
+   - `src/handlers/converter/{api_name}.ts` - 型変換
+   - `src/application/usecases/{ApiName}Usecases.ts` - ユースケース
+   - `src/domain/{api_name}/entities/{ApiName}Entity.ts` - エンティティ
+
+## 実装パターンについて
+
+### API型とドメイン型の分離を必須とする
+
+#### 型の分離原則
+- **API型**: OpenAPIスキーマから自動生成された型（`src/types/generated/`）
+- **ドメイン型**: ビジネスロジック専用の独立した型（`src/domain/*/entities/`）
+
+#### コンバーターパターンの実装
+```typescript
+// src/handlers/converter/{api_name}.ts
+import { CreateScriptUseCaseInput, CreateScriptUseCaseOutput } from "../../domain/script/entities/ScriptEntity";
+import { PostCreateScriptRequest, PostCreateScriptResponse } from "../../types";
+
+// API型からドメイン型への変換
+export function convertApiRequestToDomainInput(
+  apiRequest: PostCreateScriptRequest
+): CreateScriptUseCaseInput {
+  return {
+    // フィールドのマッピング処理
+  };
+}
+
+// ドメイン型からAPI型への変換
+export function convertDomainOutputToApiResponse(
+  domainOutput: CreateScriptUseCaseOutput
+): PostCreateScriptResponse {
+  return {
+    // フィールドのマッピング処理
+  };
+}
+```
+
+### ハンドラの実装パターンを必須とする
+
+#### ハンドラの基本構造
+```typescript
+// src/handlers/{api_name}.ts
+import { APIGatewayProxyEvent, APIGatewayProxyResult, Context } from "aws-lambda";
+import { successResponse, errorResponse, badRequestResponse } from "../utils/response";
+import { components } from "../types/generated/{api_name}";
+import { CreateApiUseCase } from "../application/usecases/{ApiName}Usecases";
+import { convertApiRequestToDomainInput, convertDomainOutputToApiResponse } from "./converter/{api_name}";
+
+// API型の定義
+type ApiRequest = components["schemas"]["PostCreateApiRequest"];
+type ApiResponse = components["schemas"]["PostCreateApiResponse"];
+
+// ユースケースの初期化
+const createApiUseCase = new CreateApiUseCase();
+
+export const createApi = async (
+  event: APIGatewayProxyEvent,
+  context: Context
+): Promise<APIGatewayProxyResult> => {
+  try {
+    // 1. リクエストボディの検証
+    if (!event.body) {
+      return badRequestResponse("Request body is required");
+    }
+
+    // 2. JSONパース
+    let apiRequest: ApiRequest;
+    try {
+      apiRequest = JSON.parse(event.body);
+    } catch (error) {
+      return badRequestResponse("Invalid JSON in request body");
+    }
+
+    // 3. API型からドメイン型に変換
+    const domainInput = convertApiRequestToDomainInput(apiRequest);
+
+    // 4. ユースケースの実行
+    const domainOutput = await createApiUseCase.execute(domainInput);
+
+    // 5. ドメイン型からAPI型に変換
+    const apiResponse = convertDomainOutputToApiResponse(domainOutput);
+
+    return successResponse(apiResponse);
+  } catch (error) {
+    console.error("Error creating api:", error);
+    return errorResponse("Failed to create api");
+  }
+};
+```
+
+### ユースケースの実装パターンを必須とする
+
+#### ユースケースの基本構造
+```typescript
+// src/application/usecases/{ApiName}Usecases.ts
+export class CreateApiUseCase {
+  async execute(request: CreateApiUseCaseInput): Promise<CreateApiUseCaseOutput> {
+    // 1. ドメイン固有のバリデーション
+    this.validateDomainRules(request);
+
+    // 2. ビジネスロジックの実行
+    const result = await this.executeBusinessLogic(request);
+
+    // 3. レスポンスの構築
+    return result;
+  }
+
+  private validateDomainRules(request: CreateApiUseCaseInput): void {
+    // ドメイン固有のビジネスルール検証
+  }
+
+  private async executeBusinessLogic(request: CreateApiUseCaseInput): Promise<CreateApiUseCaseOutput> {
+    // メインのビジネスロジック
+  }
+}
+```
+
+### エンティティの実装パターンを必須とする
+
+#### エンティティの基本構造
+```typescript
+// src/domain/{api_name}/entities/{ApiName}Entity.ts
+
+// ドメイン固有の基本型
+export interface ApiData {
+  // ビジネスロジック用のフィールド
+}
+
+// ユースケースの入力型
+export interface CreateApiUseCaseInput {
+  // ドメインロジック用の入力フィールド
+}
+
+// ユースケースの出力型
+export interface CreateApiUseCaseOutput {
+  // ドメインロジック用の出力フィールド
+}
+
+// 必要に応じてエナム型やユニオン型を定義
+export type ApiStatus = "active" | "inactive" | "pending";
+```
+
+## 重要な原則
+
+1. **責任の分離**: ハンドラ、ユースケース、エンティティで責任を明確に分離する
+2. **型安全性**: API型とドメイン型を適切に分離し、コンバーターで変換する
+3. **一貫性**: 同じパターンを全てのAPI実装で適用する
+4. **拡張性**: 新しい機能追加時に既存コードへの影響を最小限に抑える
