@@ -8,6 +8,7 @@ import { GraphAI, GraphData } from "graphai";
 import * as agents from "@graphai/agents";
 import { schoolPrompt } from "./SystemPrompts";
 import customOpenaiAgent from "../../utils/agents/openaiAgent";
+import openaiResponsesAgent from "../../utils/agents/openaiResponsesAgent";
 
 export class CreateScriptUseCase {
   async execute(
@@ -56,6 +57,8 @@ export class CreateScriptUseCase {
 
     const messages = [{ role: "system", content: schoolPrompt }];
 
+    const messagesForResponses = schoolPrompt + "webから情報を集めて。";
+
     // if (request.isSearch) {
     //   messages.push({
     //     role: "system",
@@ -86,6 +89,14 @@ export class CreateScriptUseCase {
       search_context_size: "medium",
     };
 
+    const webSearchOptionsForResponses = {
+      user_location: {
+        type: "approximate",
+        country: "JP",
+      },
+      search_context_size: "medium",
+    };
+
     const createScriptGraph: GraphData = {
       version: 2.0,
       nodes: {
@@ -96,6 +107,9 @@ export class CreateScriptUseCase {
           value: {},
         },
         messages: {
+          value: {},
+        },
+        messagesForResponses: {
           value: {},
         },
         searchMessage: {
@@ -144,6 +158,21 @@ export class CreateScriptUseCase {
           },
           if: ":isSearch",
         },
+        // searchLlm: {
+        //   agent: "openaiResponsesAgent",
+        //   params: {
+        //     model: "gpt-4.1",
+        //     tools: [
+        //       { type: "web_search_preview", ...webSearchOptionsForResponses },
+        //     ],
+        //     apiKey: process.env.OPENAI_API_KEY,
+        //   },
+        //   inputs: {
+        //     instructions: ":messagesForResponses",
+        //     input: ":promptInput",
+        //   },
+        //   if: ":isSearch",
+        // },
         output: {
           agent: "copyAgent",
           anyInput: true,
@@ -152,23 +181,23 @@ export class CreateScriptUseCase {
           },
           isResult: true,
         },
-        urlArrayOutput: {
-          agent: (namedInputs) => {
-            const { url } = namedInputs;
-            console.log("url:", url);
-            return url;
-          },
-          // inputs: { url: ":searchLlm.choices.$0.message.annotations" },
-          inputs: { url: ":searchLlm.choices" },
-          isResult: true,
-          if: ":searchCheck",
-        },
         // urlArrayOutput: {
-        //   agent: "copyAgent",
-        //   inputs: { url: ":searchLlm.choices.$0.message.annotations" },
+        //   agent: (namedInputs) => {
+        //     const { url } = namedInputs;
+        //     console.log("url:", url);
+        //     return url;
+        //   },
+        //   // inputs: { url: ":searchLlm.choices.$0.message.annotations" },
+        //   inputs: { url: ":searchLlm.choices" },
         //   isResult: true,
         //   if: ":searchCheck",
         // },
+        urlArrayOutput: {
+          agent: "copyAgent",
+          inputs: { url: ":searchLlm.choices.$0.message.annotations" },
+          isResult: true,
+          if: ":searchCheck",
+        },
       },
     };
 
@@ -179,6 +208,7 @@ export class CreateScriptUseCase {
     graphAI.injectValue("promptInput", request.prompt);
     graphAI.injectValue("isSearch", request.isSearch);
     graphAI.injectValue("messages", messages);
+    graphAI.injectValue("messagesForResponses", messagesForResponses);
     // graphAI.injectValue("searchMessage", searchMessages);
     graphAI.injectValue("reference", request?.reference ?? []);
 
