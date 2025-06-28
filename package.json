@@ -46,6 +46,7 @@
     "@graphai/agent_filters": "^2.0.0",
     "@graphai/agents": "^2.0.5",
     "graphai": "^2.0.8",
-    "openai": "^5.7.0"
+    "openai": "^5.7.0",
+    "zod": "^3.25.67"
   }
 }

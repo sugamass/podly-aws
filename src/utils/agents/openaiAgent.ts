@@ -83,7 +83,6 @@ const convertOpenAIChatCompletion = (
       ? response?.choices[0].message
       : null;
 
-  console.log("newMessage", newMessage);
   const text = newMessage && newMessage.content ? newMessage.content : null;
 
   const functionResponses =
@@ -91,7 +90,6 @@ const convertOpenAIChatCompletion = (
       ? newMessage?.tool_calls
       : [];
   // const functionId = message?.tool_calls && message?.tool_calls[0] ? message?.tool_calls[0]?.id : null;
-
   const tool_calls = functionResponses.map(convToolCall);
   const tool = tool_calls && tool_calls.length > 0 ? tool_calls[0] : undefined;
 
@@ -119,9 +117,12 @@ const convertOpenAIChatCompletion = (
 
   const responseFormat = (() => {
     if (maybeResponseFormat && text) {
-      const parsed = JSON.parse(text);
-      if (typeof parsed === "object" && parsed !== null) {
-        return parsed;
+      if (typeof text === "object" && text !== null) {
+        return text;
+      } else if (typeof text === "string") {
+        return JSON.parse(text);
+      } else {
+        throw new Error("OpenAIAgent: Invalid response format");
       }
     }
     return null;
@@ -222,6 +223,8 @@ export const openAIAgent: AgentFunction<
     baseURL,
     dangerouslyAllowBrowser: !!forWeb,
   });
+
+  console.log("response_format", response_format);
 
   const modelName = model || "gpt-4o";
   const chatParams: OpenAI.ChatCompletionCreateParams = {

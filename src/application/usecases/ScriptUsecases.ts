@@ -9,6 +9,8 @@ import * as agents from "@graphai/agents";
 import { schoolPrompt } from "./SystemPrompts";
 import customOpenaiAgent from "../../utils/agents/openaiAgent";
 import openaiResponsesAgent from "../../utils/agents/openaiResponsesAgent";
+import { zodResponseFormat } from "openai/helpers/zod";
+import { z } from "zod";
 
 export class CreateScriptUseCase {
   async execute(
@@ -97,6 +99,15 @@ export class CreateScriptUseCase {
       search_context_size: "medium",
     };
 
+    const zScriptFormat = z.object({
+      speaker: z.string(),
+      text: z.string(),
+    });
+
+    const podcastJsonFormat = z.object({
+      scripts: z.array(zScriptFormat),
+    });
+
     const createScriptGraph: GraphData = {
       version: 2.0,
       nodes: {
@@ -138,6 +149,7 @@ export class CreateScriptUseCase {
           params: {
             model: "gpt-4.1",
             apiKey: process.env.OPENAI_API_KEY,
+            response_format: zodResponseFormat(podcastJsonFormat, "podcast"),
           },
           inputs: {
             messages: ":messages",
@@ -151,6 +163,7 @@ export class CreateScriptUseCase {
             model: "gpt-4o-search-preview",
             web_search_options: webSearchOptions,
             apiKey: process.env.OPENAI_API_KEY,
+            response_format: zodResponseFormat(podcastJsonFormat, "podcast"),
           },
           inputs: {
             messages: ":messages",
