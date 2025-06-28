@@ -253,11 +253,14 @@ export const openAIAgent: AgentFunction<
       !!response_format
     );
   }
-  const chatStream = openai.beta.chat.completions.stream({
+  const chatStream = await openai.chat.completions.create({
     ...chatParams,
     stream: true,
     stream_options: { include_usage: true },
   });
+
+  let chatCompletion: OpenAI.ChatCompletion | null = null;
+  const chunks: OpenAI.Chat.Completions.ChatCompletionChunk[] = [];
 
   // streaming
   if (dataStream || stream) {
@@ -268,6 +271,7 @@ export const openAIAgent: AgentFunction<
       });
     }
     for await (const chunk of chatStream) {
+      chunks.push(chunk);
       // usage chunk have empty choices
       if (chunk.choices[0]) {
         llmMetaDataFirstTokenTime(llmMetaData);
@@ -297,8 +301,36 @@ export const openAIAgent: AgentFunction<
         response: {},
       });
     }
+  } else {
+    for await (const chunk of chatStream) {
+      chunks.push(chunk);
+    }
   }
-  const chatCompletion = await chatStream.finalChatCompletion();
+
+  // Reconstruct final completion from chunks
+  const finalChunk = chunks[chunks.length - 1];
+  const content = chunks
+    .filter((chunk) => chunk.choices[0]?.delta?.content)
+    .map((chunk) => chunk.choices[0].delta.content)
+    .join("");
+
+  chatCompletion = {
+    id: finalChunk.id,
+    object: "chat.completion",
+    created: finalChunk.created,
+    model: finalChunk.model,
+    choices: [
+      {
+        index: 0,
+        message: {
+          role: "assistant",
+          content: content,
+        },
+        finish_reason: finalChunk.choices[0]?.finish_reason || "stop",
+      },
+    ],
+    usage: finalChunk.usage || undefined,
+  } as OpenAI.ChatCompletion;
   return convertOpenAIChatCompletion(
     chatCompletion,
     messagesCopy,
