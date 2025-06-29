@@ -7,66 +7,7 @@ info:
 servers:
   - url: 'http://localhost:3000'
 paths:
-  /audio:
-    post:
-      summary: Your POST endpoint
-      tags: []
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AudioData'
-        '400':
-          description: Bad Request
-        '401':
-          description: Unauthorized
-        '500':
-          description: Internal Server Error
-      operationId: post-audio
-      x-stoplight:
-        id: modv37k9dmnlt
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PostAudioForRequest'
-    get:
-      summary: Your GET endpoint
-      tags: []
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/AudioData'
-        '400':
-          description: Bad Request
-        '500':
-          description: Internal Server Error
-      operationId: get-audio
-      x-stoplight:
-        id: bbbfdg56d0522
-      requestBody:
-        content:
-          application/json:
-            schema:
-              type: object
-              properties: {}
-      parameters:
-        - schema:
-            type: string
-          in: query
-          name: type
-        - schema:
-            type: string
-          in: query
-          name: userId
-  /audio/test:
+  /audio/preview:
     post:
       summary: Your POST endpoint
       tags: []
@@ -80,7 +21,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AudioTestResponse'
+                $ref: '#/components/schemas/AudioPreviewResponse'
         '400':
           description: Bad Request
         '500':
@@ -92,115 +33,10 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AudioTestRequest'
-  /audio/new:
-    post:
-      summary: Your POST endpoint
-      tags: []
-      responses:
-        '200':
-          description: OK
-          headers:
-            header-0:
-              schema:
-                type: string
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AudioData'
-        '400':
-          description: Bad Request
-        '500':
-          description: Internal Server Error
-      operationId: post-audio-new
-      x-stoplight:
-        id: t875yobrpei92
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/PostNewAudioRequest'
-    delete:
-      summary: Your DELETE endpoint
-      tags: []
-      responses:
-        '200':
-          description: OK
-        '400':
-          description: Bad Request
-        '500':
-          description: Internal Server Error
-      operationId: delete-audio-new
-      x-stoplight:
-        id: wer2qbt1h4t7d
-      parameters:
-        - schema:
-            type: string
-          in: query
-          name: scriptId
+              $ref: '#/components/schemas/AudioPreviewRequest'
+    parameters: []
 components:
   schemas:
-    PostAudioForRequest:
-      title: PostAudioForRequest
-      x-stoplight:
-        id: 9gwe4rypa7iif
-      type: object
-      required:
-        - title
-        - script
-        - description
-        - userId
-        - reference
-        - tts
-        - voices
-        - speakers
-      properties:
-        title:
-          type: string
-          x-stoplight:
-            id: yrxrrllw31we3
-        script:
-          type: array
-          x-stoplight:
-            id: g6vbmdwllkxk3
-          items:
-            $ref: '#/components/schemas/ScriptData'
-        description:
-          type: string
-          x-stoplight:
-            id: 5rpgugdk8ni5k
-        userId:
-          type: string
-          x-stoplight:
-            id: ehao79slqdo9k
-        reference:
-          type: array
-          x-stoplight:
-            id: cfrna24rptr79
-          items:
-            x-stoplight:
-              id: 9b14u8saoayzo
-            type: string
-        tts:
-          type: string
-          x-stoplight:
-            id: w4r0f0qh1mov2
-        voices:
-          type: array
-          x-stoplight:
-            id: vvveddlvehfwd
-          items:
-            x-stoplight:
-              id: z8lgv75frlcjy
-            type: string
-        speakers:
-          type: array
-          x-stoplight:
-            id: 5ttnzugd90xcc
-          items:
-            x-stoplight:
-              id: gxmq3m9nfp4of
-            type: string
     ScriptData:
       title: ScriptData
       x-stoplight:
@@ -209,6 +45,7 @@ components:
       required:
         - speaker
         - text
+        - caption
       properties:
         speaker:
           type: string
@@ -222,87 +59,16 @@ components:
           type: string
           x-stoplight:
             id: 53td5y44eaqd4
-    AudioData:
-      title: AudioData
-      x-stoplight:
-        id: cldg4pzltkiqq
-      type: object
-      required:
-        - id
-        - url
-        - title
-        - description
-        - reference
-        - tts
-        - voices
-        - speakers
-        - script
-        - createdBy
-        - createdAt
-      properties:
-        id:
-          type: string
-          x-stoplight:
-            id: 69eptgrwwnql3
-        url:
-          type: string
-          x-stoplight:
-            id: iulbu3564c3zy
-        title:
-          type: string
-          x-stoplight:
-            id: ldmupofnk3bpd
-        description:
-          type: string
-          x-stoplight:
-            id: lcl1tqj2p0427
-        reference:
-          type: array
-          x-stoplight:
-            id: ejc1jreulopsb
-          items:
-            x-stoplight:
-              id: gkifvhsogxstl
-            type: string
-        tts:
-          type: string
-          x-stoplight:
-            id: j498uo7q0xzw5
-        voices:
-          type: array
-          x-stoplight:
-            id: j76zawb52g5fi
-          items:
-            x-stoplight:
-              id: a6n2555p50g7e
-            type: string
-        speakers:
-          type: array
-          x-stoplight:
-            id: 0spo7sy8s0n92
-          items:
-            x-stoplight:
-              id: 8qso75pxf24ra
-            type: string
-        script:
-          type: array
-          x-stoplight:
-            id: xlnm786dhqr7k
-          items:
-            $ref: '#/components/schemas/ScriptData'
-        createdBy:
-          type: string
-          x-stoplight:
-            id: amcvy5rd36x2z
-        createdAt:
-          type: string
-          x-stoplight:
-            id: j8kx8ddywdxi8
-    AudioTestRequest:
-      title: AudioTestRequest
+    AudioPreviewRequest:
+      title: AudioPreviewRequest
       x-stoplight:
         id: h3odvb1rxkzll
       type: object
+      required:
+        - script
+        - tts
+        - voices
+        - speakers
       properties:
         script:
           type: array
@@ -334,17 +100,17 @@ components:
           type: string
           x-stoplight:
             id: sd1tr0mm5ft2d
-    AudioTestResponse:
-      title: AudioTestResponse
+    AudioPreviewResponse:
+      title: AudioPreviewResponse
       x-stoplight:
         id: b92y9uylt1nmu
       type: object
       properties:
-        m3u8Url:
+        audioUrl:
           type: string
           x-stoplight:
             id: 6271qkeulhowr
-        mp3Urls:
+        separatedAudioUrls:
           type: array
           x-stoplight:
             id: etlbdxfdarkdp
@@ -356,67 +122,3 @@ components:
           type: string
           x-stoplight:
             id: t00yeucyi0p7q
-    PostNewAudioRequest:
-      title: PostNewAudioRequest
-      x-stoplight:
-        id: mikp7gdmkr3im
-      type: object
-      required:
-        - title
-        - script
-        - userId
-        - tts
-        - voices
-        - speakers
-        - scriptId
-      properties:
-        title:
-          type: string
-          x-stoplight:
-            id: bcfobyvu8dlnu
-        description:
-          type: string
-          x-stoplight:
-            id: a8a9imn0r1olz
-        script:
-          type: array
-          x-stoplight:
-            id: 894q3z5u6gr02
-          items:
-            $ref: '#/components/schemas/ScriptData'
-        userId:
-          type: string
-          x-stoplight:
-            id: xyqqvcd3k2v6i
-        reference:
-          type: array
-          x-stoplight:
-            id: iala33uj23pa1
-          items:
-            x-stoplight:
-              id: z3lq7uw0i0i81
-            type: string
-        tts:
-          type: string
-          x-stoplight:
-            id: 9b7dggk5c5ul3
-        voices:
-          type: array
-          x-stoplight:
-            id: 7biw2bob795fy
-          items:
-            x-stoplight:
-              id: 9r8no8ly4ljz2
-            type: string
-        speakers:
-          type: array
-          x-stoplight:
-            id: ag3wfb7zhfelm
-          items:
-            x-stoplight:
-              id: ffr07q5gyy2tb
-            type: string
-        scriptId:
-          type: string
-          x-stoplight:
-            id: ugmecqn2g91ht

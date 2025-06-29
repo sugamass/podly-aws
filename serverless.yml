@@ -38,4 +38,12 @@ functions:
     events:
       - httpApi:
           path: /script/create
+          method: post
+
+  # 音声プレビューAPI
+  previewAudio:
+    handler: src/handlers/audio.previewAudio
+    events:
+      - httpApi:
+          path: /audio/preview
           method: post 

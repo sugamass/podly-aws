@@ -7,7 +7,7 @@ const createDataForHlsAgent: AgentFunction = async ({
   params,
   namedInputs,
 }) => {
-  const { outputDir, isDeleteInput } = params;
+  const { outputDir, ifDeleteInput } = params;
   const { inputFilePath, outputBaseName } = namedInputs;
   const hlsOptions = {
     segmentTime: 10,
@@ -57,9 +57,9 @@ const createDataForHlsAgent: AgentFunction = async ({
         .run();
     });
   } finally {
-    // if (isDeleteInput) {
-    //   await deleteInputFile();
-    // }
+    if (ifDeleteInput) {
+      await deleteInputFile();
+    }
   }
 
   return { fileName: hlsOptions.playlistName };

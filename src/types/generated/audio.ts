@@ -5,21 +5,9 @@
 
 
 export interface paths {
-  "/audio": {
-    /** Your GET endpoint */
-    get: operations["get-audio"];
-    /** Your POST endpoint */
-    post: operations["post-audio"];
-  };
-  "/audio/test": {
+  "/audio/preview": {
     /** Your POST endpoint */
     post: operations["post-audio-test"];
-  };
-  "/audio/new": {
-    /** Your POST endpoint */
-    post: operations["post-audio-new"];
-    /** Your DELETE endpoint */
-    delete: operations["delete-audio-new"];
   };
 }
 
@@ -27,62 +15,25 @@ export type webhooks = Record<string, never>;
 
 export interface components {
   schemas: {
-    /** PostAudioForRequest */
-    PostAudioForRequest: {
-      title: string;
-      script: components["schemas"]["ScriptData"][];
-      description: string;
-      userId: string;
-      reference: string[];
-      tts: string;
-      voices: string[];
-      speakers: string[];
-    };
     /** ScriptData */
     ScriptData: {
       speaker: string;
       text: string;
-      caption?: string;
+      caption: string;
     };
-    /** AudioData */
-    AudioData: {
-      id: string;
-      url: string;
-      title: string;
-      description: string;
-      reference: string[];
+    /** AudioPreviewRequest */
+    AudioPreviewRequest: {
+      script: components["schemas"]["ScriptData"][];
       tts: string;
       voices: string[];
       speakers: string[];
-      script: components["schemas"]["ScriptData"][];
-      createdBy: string;
-      createdAt: string;
-    };
-    /** AudioTestRequest */
-    AudioTestRequest: {
-      script?: components["schemas"]["ScriptData"][];
-      tts?: string;
-      voices?: string[];
-      speakers?: string[];
       scriptId?: string;
     };
-    /** AudioTestResponse */
-    AudioTestResponse: {
-      m3u8Url?: string;
-      mp3Urls?: string[];
+    /** AudioPreviewResponse */
+    AudioPreviewResponse: {
+      audioUrl?: string;
+      separatedAudioUrls?: string[];
       scriptId?: string;
-    };
-    /** PostNewAudioRequest */
-    PostNewAudioRequest: {
-      title: string;
-      description?: string;
-      script: components["schemas"]["ScriptData"][];
-      userId: string;
-      reference?: string[];
-      tts: string;
-      voices: string[];
-      speakers: string[];
-      scriptId: string;
     };
   };
   responses: never;
@@ -98,69 +49,11 @@ export type external = Record<string, never>;
 
 export interface operations {
 
-  /** Your GET endpoint */
-  "get-audio": {
-    parameters: {
-      query?: {
-        type?: string;
-        userId?: string;
-      };
-    };
-    requestBody?: {
-      content: {
-        "application/json": Record<string, never>;
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          "application/json": components["schemas"]["AudioData"][];
-        };
-      };
-      /** @description Bad Request */
-      400: {
-        content: never;
-      };
-      /** @description Internal Server Error */
-      500: {
-        content: never;
-      };
-    };
-  };
-  /** Your POST endpoint */
-  "post-audio": {
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["PostAudioForRequest"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        content: {
-          "application/json": components["schemas"]["AudioData"];
-        };
-      };
-      /** @description Bad Request */
-      400: {
-        content: never;
-      };
-      /** @description Unauthorized */
-      401: {
-        content: never;
-      };
-      /** @description Internal Server Error */
-      500: {
-        content: never;
-      };
-    };
-  };
   /** Your POST endpoint */
   "post-audio-test": {
     requestBody?: {
       content: {
-        "application/json": components["schemas"]["AudioTestRequest"];
+        "application/json": components["schemas"]["AudioPreviewRequest"];
       };
     };
     responses: {
@@ -170,57 +63,8 @@ export interface operations {
           "header-0"?: string;
         };
         content: {
-          "application/json": components["schemas"]["AudioTestResponse"];
+          "application/json": components["schemas"]["AudioPreviewResponse"];
         };
-      };
-      /** @description Bad Request */
-      400: {
-        content: never;
-      };
-      /** @description Internal Server Error */
-      500: {
-        content: never;
-      };
-    };
-  };
-  /** Your POST endpoint */
-  "post-audio-new": {
-    requestBody?: {
-      content: {
-        "application/json": components["schemas"]["PostNewAudioRequest"];
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        headers: {
-          "header-0"?: string;
-        };
-        content: {
-          "application/json": components["schemas"]["AudioData"];
-        };
-      };
-      /** @description Bad Request */
-      400: {
-        content: never;
-      };
-      /** @description Internal Server Error */
-      500: {
-        content: never;
-      };
-    };
-  };
-  /** Your DELETE endpoint */
-  "delete-audio-new": {
-    parameters: {
-      query?: {
-        scriptId?: string;
-      };
-    };
-    responses: {
-      /** @description OK */
-      200: {
-        content: never;
       };
       /** @description Bad Request */
       400: {
