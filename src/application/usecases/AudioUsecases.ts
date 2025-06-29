@@ -16,6 +16,8 @@ import savePostgresqlAgent from "../../Agents/save_postgresql_agent";
 import waitForFileAgent from "../../Agents/wait_for_file_agent";
 import ttsNijivoiceAgent from "../../Agents/tts_nijivoice_agent";
 import { ttsOpenaiAgent } from "@graphai/tts_openai_agent";
+import { pathUtilsAgent } from "@graphai/vanilla_node_agents";
+import customTtsOpenaiAgent from "../../Agents/custom_tts_openai_agent";
 
 // 型定義
 interface ScriptData {
@@ -73,7 +75,7 @@ export class AudioPreviewUseCase {
     let ttsAgent: string;
 
     request.voices = request.voices ?? ["shimmer", "echo"];
-    ttsAgent = "ttsOpenaiAgent";
+    ttsAgent = "customTtsOpenaiAgent";
 
     const voicemap = request.speakers?.reduce(
       (map: any, speaker: string, index: number) => {
@@ -129,10 +131,10 @@ export class AudioPreviewUseCase {
           inputs: {
             text: ":row.text",
             file: ":path.path",
+            voice: ":voice",
           },
           params: {
             throwError: true,
-            voice: ":voice",
             apiKey: ttsApiKey,
             model: openaiTtsModel,
             // speed: ":row.speed",
@@ -178,9 +180,6 @@ export class AudioPreviewUseCase {
           agent: "copyAgent",
           params: {
             namedKey: "title",
-          },
-          console: {
-            after: true,
           },
           inputs: {
             title:
@@ -233,9 +232,7 @@ export class AudioPreviewUseCase {
         // TODO copy agentで十分
         output: {
           agent: (namedInputs: any) => {
-            // const { outputDir } = params;
             const { fileName, mp3Urls } = namedInputs;
-            // console.log("outputDir:", outputDir);
             console.log("fileName:", fileName);
             console.log("mp3Urls:", mp3Urls);
             return { fileName, mp3Urls };
@@ -312,6 +309,8 @@ export class AudioPreviewUseCase {
         combineFilesAgent,
         createDataForHlsAgent,
         waitForFileAgent,
+        pathUtilsAgent,
+        customTtsOpenaiAgent,
       },
       { agentFilters }
     );

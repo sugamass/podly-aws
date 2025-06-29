@@ -44,3 +44,6 @@ pids/
 *.pid
 *.seed
 *.pid.lock 
+
+tmp_output_storage/
+tmp/

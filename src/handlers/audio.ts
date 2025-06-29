@@ -11,9 +11,7 @@ import {
 // 自動生成された音声API型をインポート
 import { components } from "../types/generated/audio";
 // UseCaseクラスをインポート
-import {
-  AudioPreviewUseCase,
-} from "../application/usecases/AudioUsecases";
+import { AudioPreviewUseCase } from "../application/usecases/AudioUsecases";
 // コンバーター関数をインポート
 import {
   convertAudioPreviewApiRequestToDomainInput,
@@ -47,13 +45,15 @@ export const previewAudio = async (
     }
 
     // API型からドメイン型に変換
-    const domainInput = convertAudioPreviewApiRequestToDomainInput(previewRequest);
+    const domainInput =
+      convertAudioPreviewApiRequestToDomainInput(previewRequest);
 
     // ユースケースの実行
     const domainOutput = await audioPreviewUseCase.execute(domainInput);
 
     // ドメイン型からAPI型に変換
-    const apiResponse = convertAudioPreviewDomainOutputToApiResponse(domainOutput);
+    const apiResponse =
+      convertAudioPreviewDomainOutputToApiResponse(domainOutput);
 
     return successResponse(apiResponse);
   } catch (error) {
