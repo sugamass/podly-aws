@@ -1,0 +1,8 @@
+# プロダクション環境専用設定（serverless.ymlをベースに上書き）
+# serverless.ymlの設定を継承
+extends: serverless.yml
+
+functions:
+  previewAudio:
+    layers:
+      - arn:aws:lambda:ap-northeast-1:145266761615:layer:ffmpeg:4 

@@ -17,6 +17,14 @@ const createDataForHlsAgent: AgentFunction = async ({
     outputDir: outputDir,
   };
 
+  // 環境に応じたffmpegパスの設定
+  if (process.env.FFMPEG_PATH) {
+    ffmpeg.setFfmpegPath(process.env.FFMPEG_PATH);
+  }
+  if (process.env.FFPROBE_PATH) {
+    ffmpeg.setFfprobePath(process.env.FFPROBE_PATH);
+  }
+
   const deleteInputFile = async () => {
     try {
       await fs.promises.unlink(inputFilePath);

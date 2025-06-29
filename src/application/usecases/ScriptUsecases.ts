@@ -7,8 +7,8 @@ import {
 import { GraphAI, GraphData } from "graphai";
 import * as agents from "@graphai/agents";
 import { schoolPrompt } from "./SystemPrompts";
-import customOpenaiAgent from "../../utils/agents/openaiAgent";
-import openaiResponsesAgent from "../../utils/agents/openaiResponsesAgent";
+import customOpenaiAgent from "../../agents/openaiAgent";
+import openaiResponsesAgent from "../../agents/openaiResponsesAgent";
 import { zodResponseFormat } from "openai/helpers/zod";
 import { z } from "zod";
 

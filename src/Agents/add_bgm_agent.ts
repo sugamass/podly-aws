@@ -4,14 +4,22 @@ import path from "path";
 import { PodcastScript } from "./type";
 import fs from "fs";
 
+// 環境に応じたffmpegパスの設定
+if (process.env.FFMPEG_PATH) {
+  ffmpeg.setFfmpegPath(process.env.FFMPEG_PATH);
+}
+if (process.env.FFPROBE_PATH) {
+  ffmpeg.setFfprobePath(process.env.FFPROBE_PATH);
+}
+
 const addBGMAgent: AgentFunction<
   { musicFileName: string },
   string,
-  { voiceFile: string; outFileName: string; script: PodcastScript }
+  { voiceFile: string; outputFilePath: string; script: PodcastScript }
 > = async ({ namedInputs, params }) => {
-  const { voiceFile, outFileName, script } = namedInputs;
+  const { voiceFile, outputFilePath, script } = namedInputs;
   const { musicFileName } = params;
-  const outputFile = path.resolve(outFileName);
+  const outputFile = path.resolve(outputFilePath);
   const musicFile = path.resolve(musicFileName);
 
   const deleteVoiceFile = async () => {
@@ -114,7 +122,7 @@ const addBGMAgent: AgentFunction<
       });
     });
   } finally {
-    // await deleteVoiceFile();
+    await deleteVoiceFile();
   }
 
   return outputFile;

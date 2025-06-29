@@ -4,18 +4,24 @@ import path from "path";
 import fs from "fs";
 import { PodcastScript } from "./type";
 
+// 環境に応じたffmpegパスの設定
+if (process.env.FFMPEG_PATH) {
+  ffmpeg.setFfmpegPath(process.env.FFMPEG_PATH);
+}
+if (process.env.FFPROBE_PATH) {
+  ffmpeg.setFfprobePath(process.env.FFPROBE_PATH);
+}
+
 const combineFilesAgent: AgentFunction<
   null, // params
   Record<string, any>, // output
-  { script: PodcastScript } // input
+  { script: PodcastScript; outputFilePath: string } // input
 > = async ({ namedInputs }) => {
-  const { script } = namedInputs;
-  const outputFile = path.resolve(
-    "src/graphaiTools/tmp/output/" + script.filename + ".mp3"
-  );
-  const silentPath = path.resolve("src/graphaiTools/music/silent300.mp3");
-  const silentLastPath = path.resolve("src/graphaiTools/music/silent800.mp3");
-  const scratchpadDir = path.resolve("src/graphaiTools/tmp/scratchpad");
+  const { script, outputFilePath } = namedInputs;
+
+  const silentPath = path.resolve("music/silent300.mp3");
+  const silentLastPath = path.resolve("music/silent800.mp3");
+  const scratchpadDir = path.resolve("scratchpad");
   const scratchpadFilePaths: string[] = [];
   const mp3filenames: string[] = script.script.map(
     (element: any) => `${element.filename}.mp3`
@@ -24,7 +30,7 @@ const combineFilesAgent: AgentFunction<
   const command = ffmpeg();
   script.script.forEach((element: any, index: number) => {
     const filePath = path.resolve(
-      "src/graphaiTools/tmp/scratchpad/" + element.filename + ".mp3"
+      "tmp_separated_audio/" + element.filename + ".mp3"
     );
     scratchpadFilePaths.push(filePath);
     const isLast = index === script.script.length - 2;
@@ -51,7 +57,7 @@ const combineFilesAgent: AgentFunction<
           console.error("Error while combining MP3 files:", err);
           reject(err);
         })
-        .mergeToFile(outputFile, path.dirname(outputFile));
+        .mergeToFile(outputFilePath, path.dirname(outputFilePath));
     });
   } catch (error) {
     console.error("An error occurred:", error);
@@ -73,7 +79,7 @@ const combineFilesAgent: AgentFunction<
     // }
   }
 
-  return { outputFile, mp3Urls: mp3filenames };
+  return { outputFile: outputFilePath, mp3Urls: mp3filenames };
 };
 
 const combineFilesAgentInfo: AgentFunctionInfo = {

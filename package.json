@@ -12,7 +12,7 @@
     "prebuild": "npm run generate-types",
     "deploy": "serverless deploy",
     "deploy:dev": "serverless deploy --stage dev",
-    "deploy:prod": "serverless deploy --stage prod",
+    "deploy:prod": "serverless deploy --stage prod --config serverless-prod.yml",
     "remove": "serverless remove",
     "logs": "serverless logs -f hello",
     "test": "echo \"Error: no test specified\" && exit 1",

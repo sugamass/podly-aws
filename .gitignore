@@ -46,4 +46,5 @@ pids/
 *.pid.lock 
 
 tmp_output_storage/
-tmp/
+tmp_separated_audio/
+scratchpad/

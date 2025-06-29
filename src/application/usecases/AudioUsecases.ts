@@ -9,15 +9,15 @@ import * as path from "path";
 import { promises as fsPromise } from "fs";
 import { GraphAI, GraphData } from "graphai";
 import * as agents from "@graphai/agents";
-import addBGMAgent from "../../Agents/add_bgm_agent";
-import combineFilesAgent from "../../Agents/combine_files_agent";
-import createDataForHlsAgent from "../../Agents/create_data_for_hls_agent";
-import savePostgresqlAgent from "../../Agents/save_postgresql_agent";
-import waitForFileAgent from "../../Agents/wait_for_file_agent";
-import ttsNijivoiceAgent from "../../Agents/tts_nijivoice_agent";
+import addBGMAgent from "../../agents/add_bgm_agent";
+import combineFilesAgent from "../../agents/combine_files_agent";
+import createDataForHlsAgent from "../../agents/create_data_for_hls_agent";
+import savePostgresqlAgent from "../../agents/save_postgresql_agent";
+import waitForFileAgent from "../../agents/wait_for_file_agent";
+import ttsNijivoiceAgent from "../../agents/tts_nijivoice_agent";
 import { ttsOpenaiAgent } from "@graphai/tts_openai_agent";
 import { pathUtilsAgent } from "@graphai/vanilla_node_agents";
-import customTtsOpenaiAgent from "../../Agents/custom_tts_openai_agent";
+import customTtsOpenaiAgent from "../../agents/custom_tts_openai_agent";
 
 // 型定義
 interface ScriptData {
@@ -112,7 +112,7 @@ export class AudioPreviewUseCase {
             method: "resolve",
           },
           inputs: {
-            dirs: ["tmp", "${:row.filename}.mp3"],
+            dirs: ["tmp_separated_audio", "${:row.filename}.mp3"],
           },
         },
         voice: {
@@ -159,19 +159,21 @@ export class AudioPreviewUseCase {
         },
         combineFiles: {
           agent: "combineFilesAgent",
-          inputs: { map: ":map", script: ":script" },
+          inputs: {
+            map: ":map",
+            script: ":script",
+            outputFilePath: "scratchpad/${:script.filename}.mp3",
+          },
           isResult: true,
         },
         addBGM: {
           agent: "addBGMAgent",
           params: {
-            musicFileName:
-              process.env.PATH_BGM ??
-              "src/graphaiTools/music/StarsBeyondEx.mp3",
+            musicFileName: "music/StarsBeyondEx.mp3",
           },
           inputs: {
             voiceFile: ":combineFiles.outputFile",
-            outFileName: "tmp/${:script.filename}_bgm.mp3",
+            outputFilePath: "scratchpad/${:script.filename}_bgm.mp3",
             script: ":script",
           },
           isResult: true,
@@ -211,8 +213,7 @@ export class AudioPreviewUseCase {
             outputDir:
               process.env.TS_OUTPUT_DIR ??
               path.resolve(process.cwd(), "tmp_output_storage"),
-            // ifDeleteInput: true,
-            isDeleteInput: false,
+            ifDeleteInput: false,
           },
           inputs: {
             inputFilePath: ":aiPodcaster.addBGM",
