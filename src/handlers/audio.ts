@@ -8,6 +8,8 @@ import {
   errorResponse,
   badRequestResponse,
 } from "../utils/response";
+import { promises as fsPromise } from "fs";
+import * as path from "path";
 // 自動生成された音声API型をインポート
 import { components } from "../types/generated/audio";
 // UseCaseクラスをインポート
@@ -61,3 +63,141 @@ export const previewAudio = async (
     return errorResponse("Failed to create audio preview");
   }
 };
+
+/**
+ * GET /stream/{filename} - 音声ファイル配信エンドポイント
+ */
+export const streamAudio = async (
+  event: APIGatewayProxyEvent,
+  context: Context
+): Promise<APIGatewayProxyResult> => {
+  try {
+    const filename = event.pathParameters?.filename;
+
+    if (!filename) {
+      return badRequestResponse("Filename is required");
+    }
+
+    // tmp_output_storageフォルダからファイルを読み込み
+    const filePath = path.resolve(
+      process.cwd(),
+      "tmp_output_storage",
+      filename
+    );
+
+    try {
+      // ファイルの存在確認
+      await fsPromise.access(filePath);
+
+      // ファイル内容を読み込み
+      const fileContent = await fsPromise.readFile(filePath);
+
+      // ファイル拡張子からContent-Typeを判定
+      const contentType = getContentType(filename);
+
+      return {
+        statusCode: 200,
+        headers: {
+          "Content-Type": contentType,
+          "Cache-Control": "max-age=3600", // 1時間キャッシュ
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Headers": "Content-Type",
+          "Access-Control-Allow-Methods": "GET, OPTIONS",
+        },
+        body: fileContent.toString("base64"),
+        isBase64Encoded: true,
+      };
+    } catch (error) {
+      console.error("File not found:", filePath);
+      return {
+        statusCode: 404,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+        body: JSON.stringify({ error: "File not found" }),
+      };
+    }
+  } catch (error) {
+    console.error("Error streaming audio file:", error);
+    return errorResponse("Failed to stream audio file");
+  }
+};
+
+/**
+ * GET /audio/{filename} - 分離音声ファイル配信エンドポイント
+ */
+export const streamSeparatedAudio = async (
+  event: APIGatewayProxyEvent,
+  context: Context
+): Promise<APIGatewayProxyResult> => {
+  try {
+    const filename = event.pathParameters?.filename;
+
+    if (!filename) {
+      return badRequestResponse("Filename is required");
+    }
+
+    // tmp_separated_audioフォルダからファイルを読み込み
+    const filePath = path.resolve(
+      process.cwd(),
+      "tmp_separated_audio",
+      filename
+    );
+
+    try {
+      // ファイルの存在確認
+      await fsPromise.access(filePath);
+
+      // ファイル内容を読み込み
+      const fileContent = await fsPromise.readFile(filePath);
+
+      // ファイル拡張子からContent-Typeを判定
+      const contentType = getContentType(filename);
+
+      return {
+        statusCode: 200,
+        headers: {
+          "Content-Type": contentType,
+          "Cache-Control": "max-age=3600", // 1時間キャッシュ
+          "Access-Control-Allow-Origin": "*",
+          "Access-Control-Allow-Headers": "Content-Type",
+          "Access-Control-Allow-Methods": "GET, OPTIONS",
+        },
+        body: fileContent.toString("base64"),
+        isBase64Encoded: true,
+      };
+    } catch (error) {
+      console.error("File not found:", filePath);
+      return {
+        statusCode: 404,
+        headers: {
+          "Access-Control-Allow-Origin": "*",
+        },
+        body: JSON.stringify({ error: "File not found" }),
+      };
+    }
+  } catch (error) {
+    console.error("Error streaming separated audio file:", error);
+    return errorResponse("Failed to stream separated audio file");
+  }
+};
+
+/**
+ * ファイル拡張子からContent-Typeを判定
+ */
+function getContentType(filename: string): string {
+  const ext = filename.split(".").pop()?.toLowerCase();
+
+  switch (ext) {
+    case "m3u8":
+      return "application/vnd.apple.mpegurl";
+    case "ts":
+      return "video/mp2t";
+    case "mp3":
+      return "audio/mpeg";
+    case "mp4":
+      return "video/mp4";
+    default:
+      return "application/octet-stream";
+  }
+}

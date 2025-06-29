@@ -60,4 +60,21 @@ functions:
     events:
       - httpApi:
           path: /audio/preview
-          method: post 
+          method: post
+
+  # 音声ファイル配信API
+  # ローカル開発用
+  streamAudio:
+    handler: src/handlers/audio.streamAudio
+    events:
+      - httpApi:
+          path: /stream/{filename+}
+          method: get
+  
+  # 分離音声ファイル配信API
+  streamSeparatedAudio:
+    handler: src/handlers/audio.streamSeparatedAudio
+    events:
+      - httpApi:
+          path: /audio/{filename+}
+          method: get 
