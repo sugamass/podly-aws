@@ -4,7 +4,7 @@ const slsw = require("serverless-webpack");
 module.exports = {
   entry: slsw.lib.entries,
   target: "node",
-  mode: "development",
+  mode: process.env.NODE_ENV === "production" ? "production" : "development",
   module: {
     rules: [
       {
@@ -31,9 +31,13 @@ module.exports = {
   },
   externals: {
     "aws-sdk": "aws-sdk",
+    "fluent-ffmpeg": "fluent-ffmpeg",
   },
   optimization: {
-    minimize: false,
+    minimize: process.env.NODE_ENV === "production",
+    usedExports: true,
+    sideEffects: false,
   },
   stats: "minimal",
+  devtool: process.env.NODE_ENV === "production" ? false : "source-map",
 };
